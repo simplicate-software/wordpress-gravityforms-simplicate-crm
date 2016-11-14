@@ -89,18 +89,38 @@ class SimplicateApi {
 		}
 	}
 
+	/**
+	 * Tests the connection.
+	 *
+	 * @return array|mixed|object
+	 */
 	public function testConnection() {
 
 		return $this->makeApiCall('GET','/base/test');
 
 	}
 
+	/**
+	 * Create a Person.
+	 *
+	 * @param array $person
+	 *
+	 * @return array|mixed|object
+	 */
 	public function createPerson( $person = [] ) {
 
 		$person = json_encode($person);
 		return $this->makeApiCall('POST','/crm/person', $person);
 
 	}
+
+	/**
+	 * Create an Organization.
+	 *
+	 * @param array $organization
+	 *
+	 * @return array|mixed|object
+	 */
 	public function createOrganization( $organization = [] ) {
 
 		$organization = json_encode( $organization );
@@ -108,6 +128,11 @@ class SimplicateApi {
 
 	}
 
+	/**
+	 * @param array $sales
+	 *
+	 * @return array|mixed|object
+	 */
 	public function createSales( $sales = [] ) {
 
 		$sales = json_encode( $sales );

@@ -574,6 +574,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 
 		$sales = [
 			'subject' => GFCommon::replace_variables( $feed['meta']['salesSubject'], $form, $entry, false, false, false, 'text' ),
+			'status_id' => 'salesstatus:6448ba9b8aa6045c', // Status is fixed (open)
 		];
 
 		$sales["{$type}_id"] = $typeId;

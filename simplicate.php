@@ -6,7 +6,7 @@
 Plugin Name: Simplicate CRM
 Plugin URI: http://simplicate.nl
 Description: Om de website te koppelen aan Simplicate heb je allereerst natuurlijk een Simplicate account nodig. Mocht je dit nog niet hebben, dan kan je dit hier vrijblijvend aanvragen. De eerste 14 dagen zijn gewoon gratis! Jouw bestaande formulieren kun je vervolgens zelf (of door de webbouwer van jouw website) uitbreiden met een koppeling naar Simplicate via Wordpress.
-Version: 1.0+BETA
+Version: 1.0.1+BETA
 Author: Simplicate Software B.V.
 Author URI: http://simplicate.nl/wordpress-plugins/
 License: MIT
