@@ -238,13 +238,27 @@ class GFSimplicateCRM extends GFFeedAddOn {
 					'class'               => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
 					'label'               => __( 'Subject', 'gravityformssimplicatecrm' ),
 				],
+                [
+                    'name'                => 'salesNote',
+                    'type'                => 'textarea',
+                    'required'            => false,
+                    'class'               => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'               => __( 'Note', 'gravityformssimplicatecrm' ),
+                ],
 				[
-					'name'                => 'salesNote',
-					'type'                => 'textarea',
-					'required'            => false,
+					'name'                => 'timelineTitle',
+					'type'                => 'text',
+					'required'            => true,
 					'class'               => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
-					'label'               => __( 'Note', 'gravityformssimplicatecrm' ),
+					'label'               => __( 'Timeline Message Title', 'gravityformssimplicatecrm' ),
 				],
+                [
+                    'name'                => 'timelineContent',
+                    'type'                => 'textarea',
+                    'required'            => false,
+                    'class'               => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'               => __( 'Timeline Content', 'gravityformssimplicatecrm' ),
+                ],
 			]
 		];
 
@@ -806,6 +820,39 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			return null;
 
 		}
+
+		try {
+
+            $title   = GFCommon::replace_variables( $feed['meta']['timelineTitle'],   $form, $entry, false, false, false, 'text' );
+            $content = GFCommon::replace_variables( $feed['meta']['timelineContent'], $form, $entry, false, false, false, 'text' );
+            
+            if(!empty($title) || !empty($content)) {
+
+                $this->log_debug( __METHOD__ . '(): Creating timeline message... ' );
+
+                $timelineMessage = [
+                    'title'        => $title,
+                    'content'      => $content,
+                    'message_type' => [
+                        'id' => 'messagetype:852d47ec82cb8055',
+                    ],
+                    'linked_to'    => [
+                        "{$type}_id" => $typeId,
+                        'sales_id'   => $sales['data']['id'],
+                    ],
+                ];
+
+                $timelineMessage = $this->api->createTimelineMessage($timelineMessage);
+
+                $this->log_debug( __METHOD__ . '(): Timeline Message #' . $timelineMessage['data']['id'] . ' created.' );
+                
+            }
+
+        } catch ( Exception $e ) {
+
+            $this->add_feed_error( sprintf( esc_html__( 'Timeline message could not be created. %s', 'gravityformssimplicatecrm' ), $e->getMessage() ), $feed, $entry, $form );
+
+        }
 
 		return $sales;
 

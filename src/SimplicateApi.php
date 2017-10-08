@@ -137,6 +137,17 @@ class SimplicateApi {
 
 	}
 
+    /**
+     * @param array $message
+     *
+     * @return array
+     */
+    public function createTimelineMessage($message = []) {
+        $message = json_encode($message);
+
+        return $this->makeApiCall('POST', '/timeline/message', $message);
+    }
+
 	/**
 	 * @param array $sales
 	 *
