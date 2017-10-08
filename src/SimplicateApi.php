@@ -115,6 +115,15 @@ class SimplicateApi {
 	}
 
 	/**
+	 * @param string $personId
+	 *
+	 * @return array
+	 */
+	public function getPersonById ( $personId ) {
+	    return $this->makeApiCall('GET', '/crm/person/' . $personId);
+	}
+
+	/**
 	 * Create an Organization.
 	 *
 	 * @param array $organization
