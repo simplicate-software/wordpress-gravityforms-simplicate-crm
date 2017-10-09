@@ -219,11 +219,18 @@ class GFSimplicateCRM extends GFFeedAddOn {
                     'field_map'     => $this->contact_person_fields_for_feed_mapping(),
                 ],
                 [
-                    'name'          =>'contactPersonCustomFields',
-                    'label'         => '',
-                    'type'          => 'dynamic_field_map',
-                    'field_map'     => $this->contact_person_custom_fields_for_feed_mapping(),
+                    'name'          => 'work_function',
+                    'type'          => 'text',
+                    'required'      => false,
+                    'class'         => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'         => __( 'Work Function', 'gravityformssimplicatecrm' ),
                 ],
+//                [
+//                    'name'          =>'contactPersonCustomFields',
+//                    'label'         => '',
+//                    'type'          => 'dynamic_field_map',
+//                    'field_map'     => $this->contact_person_custom_fields_for_feed_mapping(),
+//                ],
             ]
         ];
 
@@ -248,7 +255,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 				[
 					'name'                => 'timelineTitle',
 					'type'                => 'text',
-					'required'            => true,
+					'required'            => false,
 					'class'               => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
 					'label'               => __( 'Timeline Message Title', 'gravityformssimplicatecrm' ),
 				],
@@ -351,13 +358,6 @@ class GFSimplicateCRM extends GFFeedAddOn {
 				'field_type'    => [ 'name', 'text', 'hidden' ],
 				'default_value' => $this->get_first_field_by_type( 'name' ),
 			],
-            [
-                'name'     => 'work_function',
-                'label'    => __('Work Function', 'gravityformssimplicatecrm'),
-                'required' => false,
-                'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
-                'type'     => 'text',
-            ],
 		];
 
 	}
