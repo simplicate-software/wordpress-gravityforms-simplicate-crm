@@ -13,6 +13,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 	protected $_short_title = 'Simplicate CRM';
 	private static $_instance = null;
 
+    /** @var SimplicateApi $api */
 	protected $api = null;
 
 	protected $custom_field_key = '';
@@ -73,6 +74,12 @@ class GFSimplicateCRM extends GFFeedAddOn {
 							'value' => 'createOrganization',
 							'icon'  => 'fa-building',
 						],
+						[
+							'name'  => 'createPersonAndOrganization',
+							'label' => __( 'Create Person & Organization', 'gravityformssimplicatecrm' ),
+							'value' => 'createPersonAndOrganization',
+							'icon'  => 'fa-users',
+						],
 					]
 				],
 				[
@@ -118,6 +125,13 @@ class GFSimplicateCRM extends GFFeedAddOn {
 					'field_map'      => $this->default_fields_for_feed_mapping(),
 					'tooltip'        => '<h6>'. __( 'Map Fields', 'gravityformssimplicatecrm' ) .'</h6>' . __( 'Select which Gravity Form fields pair with their respective Simplicate CRM fields.', 'gravityformssimplicatecrm' )
 				],
+                [
+                    'name'     => 'personNote',
+                    'type'     => 'textarea',
+                    'required' => false,
+                    'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'    => __('Person Note', 'gravityformssimplicatecrm'),
+                ],
 				[
 					'name'          =>'contactCustomFields',
 					'label'         => '',
@@ -138,6 +152,13 @@ class GFSimplicateCRM extends GFFeedAddOn {
 					'field_map'      => $this->organization_fields_for_feed_mapping(),
 					'tooltip'        => '<h6>'. __( 'Map Fields', 'gravityformssimplicatecrm' ) .'</h6>' . __( 'Select which Gravity Form fields pair with their respective Simplicate CRM fields.', 'gravityformssimplicatecrm' )
 				],
+                [
+                    'name'     => 'organizationNote',
+                    'type'     => 'textarea',
+                    'required' => false,
+                    'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'    => __('Organization Note', 'gravityformssimplicatecrm'),
+                ],
 				[
 					'name'          =>'organizationCustomFields',
 					'label'         => '',
@@ -146,6 +167,72 @@ class GFSimplicateCRM extends GFFeedAddOn {
 				]
 			]
 		];
+
+		$organization_and_person_fields = [
+            'title' => __( 'Organization & Person Details', 'gravityformssimplicatecrm' ),
+            'dependency' => [ 'field' => 'actionType', 'values' => [ 'createPersonAndOrganization' ] ],
+            'fields' => [
+                [
+                    'name'           => 'contactStandardFields',
+                    'label'          => __( 'Person Map Fields', 'gravityformssimplicatecrm' ),
+                    'type'           => 'field_map',
+                    'field_map'      => $this->default_fields_for_feed_mapping(),
+                    'tooltip'        => '<h6>'. __( 'Person Map Fields', 'gravityformssimplicatecrm' ) .'</h6>' . __( 'Select which Gravity Form fields pair with their respective Simplicate CRM fields.', 'gravityformssimplicatecrm' )
+                ],
+                [
+                    'name'     => 'personNote',
+                    'type'     => 'textarea',
+                    'required' => false,
+                    'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'    => __('Person Note', 'gravityformssimplicatecrm'),
+                ],
+                [
+                    'name'          =>'contactCustomFields',
+                    'label'         => '',
+                    'type'          => 'dynamic_field_map',
+                    'field_map'     => $this->custom_fields_for_feed_mapping(),
+                ],
+                [
+                    'name'           => 'organizationStandardFields',
+                    'label'          => __( 'Organization Map Fields', 'gravityformssimplicatecrm' ),
+                    'type'           => 'field_map',
+                    'field_map'      => $this->organization_fields_for_feed_mapping(),
+                    'tooltip'        => '<h6>'. __( 'Organization Map Fields', 'gravityformssimplicatecrm' ) .'</h6>' . __( 'Select which Gravity Form fields pair with their respective Simplicate CRM fields.', 'gravityformssimplicatecrm' )
+                ],
+                [
+                    'name'     => 'organizationNote',
+                    'type'     => 'textarea',
+                    'required' => false,
+                    'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'    => __('Organization Note', 'gravityformssimplicatecrm'),
+                ],
+                [
+                    'name'          =>'organizationCustomFields',
+                    'label'         => '',
+                    'type'          => 'dynamic_field_map',
+                    'field_map'     => $this->organization_custom_fields_for_feed_mapping(),
+                ],
+                [
+                    'name'          =>'contactPersonStandardFields',
+                    'label'         => __( 'Contact Person Map Fields', 'gravityformssimplicatecrm' ),
+                    'type'          => 'field_map',
+                    'field_map'     => $this->contact_person_fields_for_feed_mapping(),
+                ],
+                [
+                    'name'          => 'work_function',
+                    'type'          => 'text',
+                    'required'      => false,
+                    'class'         => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'         => __( 'Work Function', 'gravityformssimplicatecrm' ),
+                ],
+//                [
+//                    'name'          =>'contactPersonCustomFields',
+//                    'label'         => '',
+//                    'type'          => 'dynamic_field_map',
+//                    'field_map'     => $this->contact_person_custom_fields_for_feed_mapping(),
+//                ],
+            ]
+        ];
 
 		$sales_fields = [
 			'title' => __( 'Sales Details', 'gravityformssimplicatecrm' ),
@@ -157,7 +244,28 @@ class GFSimplicateCRM extends GFFeedAddOn {
 					'required'            => true,
 					'class'               => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
 					'label'               => __( 'Subject', 'gravityformssimplicatecrm' ),
-				]
+				],
+                [
+                    'name'                => 'salesNote',
+                    'type'                => 'textarea',
+                    'required'            => false,
+                    'class'               => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'               => __( 'Note', 'gravityformssimplicatecrm' ),
+                ],
+				[
+					'name'                => 'timelineTitle',
+					'type'                => 'text',
+					'required'            => false,
+					'class'               => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+					'label'               => __( 'Timeline Message Title', 'gravityformssimplicatecrm' ),
+				],
+                [
+                    'name'                => 'timelineContent',
+                    'type'                => 'textarea',
+                    'required'            => false,
+                    'class'               => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+                    'label'               => __( 'Timeline Content', 'gravityformssimplicatecrm' ),
+                ],
 			]
 		];
 
@@ -177,7 +285,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			]
 		];
 
-		return [$base_fields, $person_fields, $organization_fields, $sales_fields, $conditional_fields];
+		return [$base_fields, $person_fields, $organization_fields, $organization_and_person_fields, $sales_fields, $conditional_fields];
 
 	}
 
@@ -230,6 +338,56 @@ class GFSimplicateCRM extends GFFeedAddOn {
 	}
 
 	/**
+	 * Default fields for mapping feed.
+	 *
+	 * @return array
+	 */
+	public function contact_person_fields_for_feed_mapping() {
+		return [
+			[
+				'name'          => 'work_email',
+				'label'         => __( 'Work Email', 'gravityformssimplicatecrm'),
+				'required'      => false,
+				'field_type'    => [ 'email', 'hidden' ],
+				'default_value' => $this->get_first_field_by_type( 'email', 3 ),
+			],
+			[
+				'name'          => 'work_mobile',
+				'label'         => __( 'Work Mobile', 'gravityformssimplicatecrm'),
+				'required'      => false,
+				'field_type'    => [ 'name', 'text', 'hidden' ],
+				'default_value' => $this->get_first_field_by_type( 'name' ),
+			],
+		];
+
+	}
+
+	/**
+	 * Default fields for mapping feed.
+	 *
+	 * @return array
+	 */
+	public function contact_person_custom_fields_for_feed_mapping() {
+		return [
+//			[
+//				'name'          => 'work_function',
+//				'label'         => __( 'Work Function', 'gravityformssimplicatecrm'),
+//				'required'      => false,
+//				'field_type'    => [ 'name', 'text', 'hidden' ],
+//                'default_value' => $this->get_first_field_by_type( 'name', 3 ),
+//			],
+//            [
+//                'name'     => 'work_function',
+//                'label'    => __('Work Function', 'gravityformssimplicatecrm'),
+//                'required' => false,
+//                'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+//                'type'     => 'text',
+//            ],
+		];
+
+	}
+
+	/**
 	 * Custom field for feed mapping.
 	 *
 	 * @return array
@@ -243,10 +401,6 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			[
 				'value'     => 'phone',
 				'label'     => __( 'Phone', 'gravityformssimplicatecrm')
-			],
-			[
-				'value'     => 'note',
-				'label'     => __( 'Note', 'gravityformssimplicatecrm')
 			],
 			[
 				'value'     => 'website_url',
@@ -312,10 +466,6 @@ class GFSimplicateCRM extends GFFeedAddOn {
 				'value'     => 'url',
 				'label'     => __( 'Website URL', 'gravityformssimplicatecrm')
 			],
-			[
-				'value'     => 'note',
-				'label'     => __( 'Note', 'gravityformssimplicatecrm')
-			],
 		];
 	}
 
@@ -330,7 +480,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 
 		$this->log_debug( __METHOD__ . '(): Processing feed.' );
 
-		$personSales = $organizationSales = false;
+		$personSales = $organizationSales = $personAndOrganizationSales = false;
 
 		if ( ! $this->initialize_api() ) {
 
@@ -349,12 +499,26 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			$organizationSales = true;
 		}
 
-		if ( rgars( $feed, 'meta/createSales' ) == 1 ) {
-			if($personSales)
-				$sales = $this->create_sales( $feed, $entry, $form, 'person', $person['data']['id'] );
-			if($organizationSales)
-				$sales = $this->create_sales( $feed, $entry, $form, 'organization', $organization['data']['id'] );
+		if ( rgars( $feed, 'meta/actionType') == 'createPersonAndOrganization' ) {
+            $organization = $this->create_organization( $feed, $entry, $form );
+            $person = $this->create_person( $feed, $entry, $form, $organization );
+			$personAndOrganizationSales = true;
 		}
+
+        if(rgars($feed, 'meta/createSales') == 1) {
+            if($personSales) {
+                $sales = $this->create_sales($feed, $entry, $form, 'person', $person['data']['id']);
+            }
+            if($organizationSales) {
+                $sales = $this->create_sales($feed, $entry, $form, 'organization', $organization['data']['id']);
+            }
+            if($personAndOrganizationSales) {
+                $sales = $this->create_sales($feed, $entry, $form, 'organization', $organization['data']['id'], [
+                    'person'       => $person['data']['id'],
+                    'organization' => $organization['data']['id'],
+                ]);
+            }
+        }
 	}
 
 	/**
@@ -402,14 +566,16 @@ class GFSimplicateCRM extends GFFeedAddOn {
  * @param array $feed
  * @param array $entry
  * @param array $form
+ * @param array $contactPersonByOrganization
  * @return array $person
  */
-	public function create_person( $feed, $entry, $form  ) {
+	public function create_person( $feed, $entry, $form, $contactPersonByOrganization = null ) {
 
-		$this->log_debug( __METHOD__ . '(): Creating contact.' );
+		$this->log_debug( __METHOD__ . '(): Creating person.' );
 
 		/* Setup mapped fields array. */
 		$contact_standard_fields = $this->get_field_map_fields( $feed, 'contactStandardFields' );
+		$contact_person_standard_fields = $this->get_field_map_fields( $feed, 'contactPersonStandardFields' );
 		$contact_custom_fields   = $this->get_dynamic_field_map_fields( $feed, 'contactCustomFields' );
 
 		$first_name     = $this->get_field_value( $form, $entry, $contact_standard_fields['first_name'] );
@@ -430,11 +596,30 @@ class GFSimplicateCRM extends GFFeedAddOn {
 
 		}
 
-		$person = [
-			'first_name' => $first_name,
-			'family_name' => $family_name,
-			'email' => $email,
-		];
+        $person = [
+            'first_name'  => $first_name,
+            'family_name' => $family_name,
+            'email'       => $email,
+            'note'        => GFCommon::replace_variables( $feed['meta']['personNote'], $form, $entry, false, false, false, 'text' ),
+        ];
+		if($contactPersonByOrganization) {
+            $this->log_debug( __METHOD__ . '(): Person is contact by organization: ' . print_r($contactPersonByOrganization, true) );
+		    $contact = [];
+		    foreach([
+		        'work_function',
+                'work_email',
+                'work_mobile',
+            ] as $cpField) {
+		        if($val = $this->get_field_value( $form, $entry, $contact_person_standard_fields[$cpField] )) {
+		            $contact[$cpField] = $val;
+                }
+            }
+            if($contact) {
+                $this->log_debug( __METHOD__ . '(): At least one of the contact fields was filled, so filling linked_as_contact_to_organization' );
+                $contact['organization_id'] = $contactPersonByOrganization['data']['id'];
+                $person['linked_as_contact_to_organization'][] = $contact;
+            }
+        }
 
 		foreach ( $contact_custom_fields as $field_key => $field_id ) {
 
@@ -451,7 +636,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 
 		}
 
-		$this->log_debug( __METHOD__ . '(): Creating contact: ' . print_r( $person, true ) );
+		$this->log_debug( __METHOD__ . '(): Creating person: ' . print_r( $person, true ) );
 
 		try {
 
@@ -487,7 +672,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 	 */
 	public function create_organization( $feed, $entry, $form  ) {
 
-		$this->log_debug( __METHOD__ . '(): Creating contact.' );
+		$this->log_debug( __METHOD__ . '(): Creating organization.' );
 
 		/* Setup mapped fields array. */
 		$contact_standard_fields = $this->get_field_map_fields( $feed, 'organizationStandardFields' );
@@ -513,6 +698,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 		$organization = [
 			'name'  => $name,
 			'email' => $email,
+            'note'  => GFCommon::replace_variables( $feed['meta']['organizationNote'], $form, $entry, false, false, false, 'text' ),
 		];
 
 		foreach ( $contact_custom_fields as $field_key => $field_id ) {
@@ -541,7 +727,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			gform_update_meta( $entry['id'], 'simplicatecrm_person_id', $organization['data']['id'] );
 
 			/* Log that contact was created. */
-			$this->log_debug( __METHOD__ . '(): Person #' . $organization['data']['id'] . ' created.' );
+			$this->log_debug( __METHOD__ . '(): Organization #' . $organization['data']['id'] . ' created.' );
 
 		} catch ( Exception $e ) {
 
@@ -555,26 +741,28 @@ class GFSimplicateCRM extends GFFeedAddOn {
 
 	}
 
-	/**
-	 * Create Sales.
-	 *
-	 * @access public
-	 *
-	 * @param array $feed
-	 * @param array $entry
-	 * @param array $form
-	 * @param string $type
-	 * @param $typeId
-	 *
-	 * @return array $organization
-	 */
-	public function create_sales( $feed, $entry, $form, $type = 'organization', $typeId = null ) {
+    /**
+     * Create Sales.
+     *
+     * @access public
+     *
+     * @param array  $feed
+     * @param array  $entry
+     * @param array  $form
+     * @param string $type
+     * @param        $typeId
+     * @param array  $orgAndPerson
+     *
+     * @return array $organization
+     */
+	public function create_sales( $feed, $entry, $form, $type = 'organization', $typeId = null, $orgAndPerson = [] ) {
 
 		$this->log_debug( __METHOD__ . '(): Creating sales.' );
 
 		$sales = [
 			'subject' => GFCommon::replace_variables( $feed['meta']['salesSubject'], $form, $entry, false, false, false, 'text' ),
 			'status_id' => 'salesstatus:6448ba9b8aa6045c', // Status is fixed (open)
+            'note'      => GFCommon::replace_variables( $feed['meta']['salesNote'], $form, $entry, false, false, false, 'text' ),
 		];
 
 		$sales["{$type}_id"] = $typeId;
@@ -586,6 +774,31 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			return [];
 
 		}
+		
+		if($orgAndPerson) {
+            $this->log_debug( __METHOD__ . '(): Getting person by its ID: ' . print_r($orgAndPerson['person'], true) );
+		    $persons = $this->api->getPersonById($orgAndPerson['person']); // Returns a single person, not a collection of persons
+		    if(!empty($persons['data'])) {
+		        $person = $persons['data'];
+		        /** @var bool|array $contactPersons */
+		        $contactPersons = isset($person['linked_as_contact_to_organization']) && !empty($person['linked_as_contact_to_organization'])
+                    ? $person['linked_as_contact_to_organization']
+                    : false;
+		        if($contactPersons) {
+		            $contactPerson = array_shift($contactPersons);
+		            if(isset($contactPerson['id'])) {
+                        $this->log_debug( __METHOD__ . '(): Found contact person and its id, filling sales its contact_id' );
+		                $sales['contact_id'] = $contactPerson['id'];
+                    } else {
+                        $this->log_debug( __METHOD__ . '(): No contact person id found' );
+                    }
+                } else {
+                    $this->log_debug( __METHOD__ . '(): No contact persons found' );
+                }
+            } else {
+                $this->log_debug( __METHOD__ . '(): No entries for person with ID: ' . print_r($orgAndPerson['person'], true) );
+            }
+        }
 
 		$this->log_debug( __METHOD__ . '(): Creating sales: ' . print_r( $sales, true ) );
 
@@ -598,7 +811,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			gform_update_meta( $entry['id'], 'simplicatecrm_sales_id', $sales['data']['id'] );
 
 			/* Log that contact was created. */
-			$this->log_debug( __METHOD__ . '(): Person #' . $sales['data']['id'] . ' created.' );
+			$this->log_debug( __METHOD__ . '(): Sales #' . $sales['data']['id'] . ' created.' );
 
 		} catch ( Exception $e ) {
 
@@ -607,6 +820,39 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			return null;
 
 		}
+
+		try {
+
+            $title   = GFCommon::replace_variables( $feed['meta']['timelineTitle'],   $form, $entry, false, false, false, 'text' );
+            $content = GFCommon::replace_variables( $feed['meta']['timelineContent'], $form, $entry, false, false, false, 'text' );
+            
+            if(!empty($title) || !empty($content)) {
+
+                $this->log_debug( __METHOD__ . '(): Creating timeline message... ' );
+
+                $timelineMessage = [
+                    'title'        => $title,
+                    'content'      => $content,
+                    'message_type' => [
+                        'id' => 'messagetype:852d47ec82cb8055',
+                    ],
+                    'linked_to'    => [
+                        "{$type}_id" => $typeId,
+                        'sales_id'   => $sales['data']['id'],
+                    ],
+                ];
+
+                $timelineMessage = $this->api->createTimelineMessage($timelineMessage);
+
+                $this->log_debug( __METHOD__ . '(): Timeline Message #' . $timelineMessage['data']['id'] . ' created.' );
+                
+            }
+
+        } catch ( Exception $e ) {
+
+            $this->add_feed_error( sprintf( esc_html__( 'Timeline message could not be created. %s', 'gravityformssimplicatecrm' ), $e->getMessage() ), $feed, $entry, $form );
+
+        }
 
 		return $sales;
 

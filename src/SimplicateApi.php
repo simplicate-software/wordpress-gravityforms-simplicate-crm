@@ -115,6 +115,15 @@ class SimplicateApi {
 	}
 
 	/**
+	 * @param string $personId
+	 *
+	 * @return array
+	 */
+	public function getPersonById ( $personId ) {
+	    return $this->makeApiCall('GET', '/crm/person/' . $personId);
+	}
+
+	/**
 	 * Create an Organization.
 	 *
 	 * @param array $organization
@@ -127,6 +136,17 @@ class SimplicateApi {
 		return $this->makeApiCall('POST','/crm/organization', $organization);
 
 	}
+
+    /**
+     * @param array $message
+     *
+     * @return array
+     */
+    public function createTimelineMessage($message = []) {
+        $message = json_encode($message);
+
+        return $this->makeApiCall('POST', '/timeline/message', $message);
+    }
 
 	/**
 	 * @param array $sales
