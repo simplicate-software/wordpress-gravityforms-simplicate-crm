@@ -844,6 +844,8 @@ class GFSimplicateCRM extends GFFeedAddOn {
                     ],
                 ];
 
+                $this->log_debug( __METHOD__ . '(): Creating timeline message: ' . print_r( $timelineMessage, true ) );
+
                 $timelineMessage = $this->api->createTimelineMessage($timelineMessage);
 
                 $this->log_debug( __METHOD__ . '(): Timeline Message #' . $timelineMessage['data']['id'] . ' created.' );
