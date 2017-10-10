@@ -605,8 +605,10 @@ class GFSimplicateCRM extends GFFeedAddOn {
 		if($contactPersonByOrganization) {
             $this->log_debug( __METHOD__ . '(): Person is contact by organization: ' . print_r($contactPersonByOrganization, true) );
 		    $contact = [];
+            if(!empty( $feed['meta']['work_function'] )) {
+                $contact['work_function'] = GFCommon::replace_variables( $feed['meta']['work_function'], $form, $entry, false, false, false, 'text' );
+            }
 		    foreach([
-		        'work_function',
                 'work_email',
                 'work_mobile',
             ] as $cpField) {
@@ -841,6 +843,8 @@ class GFSimplicateCRM extends GFFeedAddOn {
                         'sales_id'   => $sales['data']['id'],
                     ],
                 ];
+
+                $this->log_debug( __METHOD__ . '(): Creating timeline message: ' . print_r( $timelineMessage, true ) );
 
                 $timelineMessage = $this->api->createTimelineMessage($timelineMessage);
 
