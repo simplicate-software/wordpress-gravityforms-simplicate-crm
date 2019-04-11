@@ -42,6 +42,21 @@ class GFSimplicateCRM extends GFFeedAddOn {
 	 */
 	public function feed_settings_fields() {
 
+        $personOptinField1 = [
+            'name'     => 'personOptinTitle',
+            'type'     => 'text',
+            'required' => false,
+            'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+            'label'    => __('Timeline Message Opt-In Title', 'gravityformssimplicatecrm'),
+        ];
+        $personOptinField2 = [
+            'name'     => 'personOptinContent',
+            'type'     => 'textarea',
+            'required' => false,
+            'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
+            'label'    => __('Timeline Message Opt-In Content', 'gravityformssimplicatecrm'),
+        ];
+
 		// Base Fields Array.
 		$base_fields = [
 			'title'     => '',
@@ -132,6 +147,8 @@ class GFSimplicateCRM extends GFFeedAddOn {
                     'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
                     'label'    => __('Person Note', 'gravityformssimplicatecrm'),
                 ],
+                $personOptinField1,
+                $personOptinField2,
 				[
 					'name'          =>'contactCustomFields',
 					'label'         => '',
@@ -186,6 +203,8 @@ class GFSimplicateCRM extends GFFeedAddOn {
                     'class'    => 'medium merge-tag-support mt-position-right mt-hide_all_fields',
                     'label'    => __('Person Note', 'gravityformssimplicatecrm'),
                 ],
+                $personOptinField1,
+                $personOptinField2,
                 [
                     'name'          =>'contactCustomFields',
                     'label'         => '',
@@ -547,6 +566,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			$simplicate->testConnection();
 
 			$this->api = $simplicate;
+			$this->log_debug(__METHOD__ . '(): API initialized for ' . $this->api->apiUrl);
 
 			return true;
 
@@ -640,6 +660,7 @@ class GFSimplicateCRM extends GFFeedAddOn {
 
 		$this->log_debug( __METHOD__ . '(): Creating person: ' . print_r( $person, true ) );
 
+
 		try {
 
 			/* Create contact. */
@@ -658,6 +679,31 @@ class GFSimplicateCRM extends GFFeedAddOn {
 			return null;
 
 		}
+
+        if(isset($feed['meta']['personOptinTitle']) || isset($feed['meta']['personOptinContent'])) {
+            $title = $feed['meta']['personOptinTitle'];
+            $content = GFCommon::replace_variables($feed['meta']['personOptinContent'], $form, $entry, false, false, false, 'text');
+            if($content && $title) {
+                try {
+                    $timelineMessage = $this->api->createTimelineMessage([
+                        'title'        => $title,
+                        'content'      => $content,
+                        'message_type' => [
+                            'id' => 'messagetype:852d47ec82cb8055',
+                        ],
+                        'linked_to'    => [
+                            'person_id' => $person['data']['id'],
+                        ],
+                    ]);
+
+                    $this->log_debug(__METHOD__ . '(): Timeline message #' . $timelineMessage['data']['id'] . ' created.');
+                } catch(\Exception $e) {
+
+                    $this->add_feed_error(sprintf(esc_html__('Timeline opt in message could not be created for person. %s', 'gravityformssimplicatecrm'), $e->getMessage()), $feed, $entry, $form);
+
+                }
+            }
+        }
 
 		return $person;
 
